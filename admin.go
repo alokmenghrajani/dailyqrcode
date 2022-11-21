@@ -24,7 +24,6 @@ func (app *App) admin(w http.ResponseWriter, r *http.Request) {
 	// render page
 	const html = `<html>
 		<head>
-			<link href="/static/style.css" rel="stylesheet">
 			<link rel="icon" type="image/png" href="/static/favicon.png" sizes="32x32">
 		</head>
 		<body>
