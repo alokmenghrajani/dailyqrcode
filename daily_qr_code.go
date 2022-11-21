@@ -209,7 +209,7 @@ func (app *App) archive(w http.ResponseWriter, r *http.Request) {
 		<body>
 			<h1>Archive</h1>
 			{{range .AllUrls}}
-				<li><a href="/x/{{.Id}}">{{.ActiveAt.Format "Jan 2, 2006"}}</a></li>
+				<li><a href="/{{.Id}}">{{.ActiveAt.Format "Jan 2, 2006"}}</a></li>
 			{{else}}
 				<p>Sorry, archive is empty.</p>
 			{{end}}
