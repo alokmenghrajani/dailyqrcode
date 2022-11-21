@@ -184,6 +184,7 @@ func (app *App) about(w http.ResponseWriter, r *http.Request) {
 			<ul>
 				<li>https://da.ilyqrco.de/ is nonjudgemental — everyone gets the same content.
 				<li>https://da.ilyqrco.de/ is a fresh surprise every day — see you tomorrow!
+				<li>https://da.ilyqrco.de/ is <a href="https://github.com/alokmenghrajani/dailyqrcode">open source</a>.
 			</ul>
 		</body>
 	</html>`
