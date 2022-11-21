@@ -64,6 +64,7 @@ func main() {
 	mux.HandleFunc("/archive", nopanic(app.archive))
 	mux.HandleFunc("/l/", nopanic(app.redirect))
 	mux.HandleFunc("/", nopanic(app.index))
+	mux.HandleFunc("/robots.txt", nopanic(app.robotsTxt))
 
 	// Admin pages
 	mux.HandleFunc("/admin", nopanic(app.admin))
@@ -269,4 +270,9 @@ func (app *App) imageCommon(w http.ResponseWriter, id string, size int) {
 
 	w.Header().Add("Cache-Control", "public, max-age=86400, immutable")
 	w.Write(b.Bytes())
+}
+
+func (app *App) robotsTxt(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Write([]byte("User-agent: *\nAllow: /\n"))
 }
