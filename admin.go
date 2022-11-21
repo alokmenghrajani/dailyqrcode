@@ -30,6 +30,7 @@ func (app *App) admin(w http.ResponseWriter, r *http.Request) {
 		<body>
 			<h1>Admin</h1>
 			{{if .IsAdmin }}
+				{{.Now}}
 				<form action="/admin/add" method="POST">
 					<p>url: <input name="url" type="text"></p>
 					<p>comment: <input name="comment" type="text"></p>
@@ -59,9 +60,10 @@ func (app *App) admin(w http.ResponseWriter, r *http.Request) {
 	panicOnErr(err)
 
 	err = t.ExecuteTemplate(w, "html", struct {
+		Now     time.Time
 		IsAdmin bool
 		AllUrls []Url
-	}{IsAdmin: isAdmin, AllUrls: allUrls})
+	}{Now: time.Now(), IsAdmin: isAdmin, AllUrls: allUrls})
 	panicOnErr(err)
 }
 
