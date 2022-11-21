@@ -59,6 +59,7 @@ func main() {
 
 	// Main functionality
 	mux.HandleFunc("/img/", nopanic(app.image))
+	mux.HandleFunc("/large/", nopanic(app.largeImage))
 	mux.HandleFunc("/about", nopanic(app.about))
 	mux.HandleFunc("/archive", nopanic(app.archive))
 	mux.HandleFunc("/l/", nopanic(app.redirect))
@@ -100,6 +101,13 @@ func (app *App) index(w http.ResponseWriter, r *http.Request) {
 			<head>
 				<link href="/static/style.css" rel="stylesheet">
 				<link rel="icon" type="image/png" href="/static/favicon.png" sizes="32x32">
+				<title>Daily QR Code #{{.Id}}</title>
+				<meta property="og:title" content="Daily QR Code #{{.Id}}">
+				<meta property="og:description" content="A fresh surprise every day!">
+				<meta property="og:type" content="article">
+				<meta property="og:url" content="https://da.ilyqrco.de/{{.Id}}">
+				<meta property="og:image" content="https://da.ilyqrco.de/large/{{.Id}}">
+				<meta name="twitter:card" content="summary_large_image">
 			</head>
 			<body>
 				<h1>Daily QRCode</h1>
@@ -166,6 +174,7 @@ func (app *App) about(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Cache-Control", "public, max-age=86400, immutable")
 	const html = `<html>
 		<head>
+			<title>About Daily QR Code</title>
 			<link href="/static/style.css" rel="stylesheet">
 			<link rel="icon" type="image/png" href="/static/favicon.png" sizes="32x32">
 		</head>
@@ -193,6 +202,7 @@ func (app *App) archive(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Cache-Control", "public, max-age=3600")
 	const html = `<html>
 		<head>
+			<title>Daily QR Code Archive</title>
 			<link href="/static/style.css" rel="stylesheet">
 			<link rel="icon" type="image/png" href="/static/favicon.png" sizes="32x32">
 		</head>
@@ -217,24 +227,36 @@ func (app *App) image(w http.ResponseWriter, r *http.Request) {
 		panic(fmt.Errorf("unexpected path: %s", r.URL.Path))
 	}
 	id := r.URL.Path[5:]
+	app.imageCommon(w, id, 1)
+}
+
+func (app *App) largeImage(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasPrefix(r.URL.Path, "/large/") {
+		panic(fmt.Errorf("unexpected path: %s", r.URL.Path))
+	}
+	id := r.URL.Path[7:]
+	app.imageCommon(w, id, 25)
+}
+
+func (app *App) imageCommon(w http.ResponseWriter, id string, size int) {
 	qr, err := qrcode.New(fmt.Sprintf("http://da.ilyqrco.de/l/%s", id), qrcode.Low)
 	panicOnErr(err)
 
 	qr.BackgroundColor = color.RGBA{0xff, 0xff, 0xff, 0x00}
 	qr.ForegroundColor = color.RGBA{66, 176, 245, 0xff}
 	tmColor := color.RGBA{166, 176, 245, 0xff}
-	img := qr.Image(-1).(*image.Paletted)
+	img := qr.Image(-size).(*image.Paletted)
 	img.Palette = append(img.Palette, tmColor)
 	tmColorIndex := uint8(img.Palette.Index(tmColor))
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			pos := img.PixOffset(6+j, 6+i)
+	for i := 0; i < 3*size; i++ {
+		for j := 0; j < 3*size; j++ {
+			pos := img.PixOffset(6*size+j, 6*size+i)
 			img.Pix[pos] = tmColorIndex
 
-			pos = img.PixOffset(img.Rect.Dx()-9+j, 6+i)
+			pos = img.PixOffset(img.Rect.Dx()-9*size+j, 6*size+i)
 			img.Pix[pos] = tmColorIndex
 
-			pos = img.PixOffset(6+j, img.Rect.Dy()-9+i)
+			pos = img.PixOffset(6*size+j, img.Rect.Dy()-9*size+i)
 			img.Pix[pos] = tmColorIndex
 		}
 	}
