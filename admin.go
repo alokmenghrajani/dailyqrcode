@@ -23,6 +23,8 @@ func (app *App) admin(w http.ResponseWriter, r *http.Request) {
 		panicOnErr(err)
 	}
 
+	w.Header().Add("Cache-Control", "private, no-store")
+
 	// render page
 	const html = `<html>
 		<head>
