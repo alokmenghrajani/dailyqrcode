@@ -14,10 +14,12 @@ import (
 )
 
 func (app *App) admin(w http.ResponseWriter, r *http.Request) {
-	var allUrls []Url
+	var queued []Url
 	isAdmin := isAdmin(w, r)
+	n := truncatedNow()
+
 	if isAdmin {
-		err := app.db.Find(&allUrls).Error
+		err := app.db.Where("active_at > ?", n).Find(&queued).Error
 		panicOnErr(err)
 	}
 
@@ -29,22 +31,25 @@ func (app *App) admin(w http.ResponseWriter, r *http.Request) {
 		<body>
 			<h1>Admin</h1>
 			{{if .IsAdmin }}
-				{{.Now}}
+				<p>Current time: {{.Now}}</p>
+				<p>Queue size: {{len .Queued}}</p>
 				<form action="/admin/add" method="POST">
 					<p>url: <input name="url" type="text"></p>
 					<p>comment: <input name="comment" type="text"></p>
 					<p>private: <input name="private" type="text"></p>
 					<p><input type="submit" value="add url"></p>
 				</form>
-				<h2>All urls</h2>
+				<h2>Queued</h2>
 				<ul>
-				{{range .AllUrls}}
+				{{range .Queued}}
 					<li>
 						<p><a href="{{.Url}}">{{.Url}}</a></p>
 						<p>Active at: {{.ActiveAt.Format "Jan 2, 2006"}}</p>
 						<p>Comment: {{.Comment}}</p>
 						<p>Private: {{.Private}}</p>
 					</li>
+				{{else}}
+					<b>No more items in queue!</b>
 				{{end}}
 				<ul>
 			{{else}}
@@ -61,8 +66,8 @@ func (app *App) admin(w http.ResponseWriter, r *http.Request) {
 	err = t.ExecuteTemplate(w, "html", struct {
 		Now     time.Time
 		IsAdmin bool
-		AllUrls []Url
-	}{Now: time.Now(), IsAdmin: isAdmin, AllUrls: allUrls})
+		Queued  []Url
+	}{Now: time.Now(), IsAdmin: isAdmin, Queued: queued})
 	panicOnErr(err)
 }
 
