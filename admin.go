@@ -73,8 +73,12 @@ func (app *App) admin(w http.ResponseWriter, r *http.Request) {
 
 func (app *App) adminLogin(w http.ResponseWriter, r *http.Request) {
 	cookie := &http.Cookie{
-		Name:  "admin",
-		Value: r.PostFormValue("password"),
+		Name:     "admin",
+		Value:    r.PostFormValue("password"),
+		Expires:  time.Now().Add(365 * 24 * time.Hour),
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, cookie)
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
