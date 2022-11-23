@@ -210,11 +210,15 @@ func (app *App) archive(w http.ResponseWriter, r *http.Request) {
 		</head>
 		<body>
 			<h1>Archive</h1>
-			{{range .AllUrls}}
-				<li><a href="/{{.Id}}">{{.ActiveAt.Format "Jan 2, 2006"}}</a></li>
-			{{else}}
-				<p>Sorry, archive is empty.</p>
-			{{end}}
+			<ul>
+				{{range .AllUrls}}
+					<li>
+					  <p><a href="/{{.Id}}">{{.ActiveAt.Format "Jan 2, 2006"}}</a>: {{.Comment}}<br><small><a href="{{.Url}}">{{.Url}}</a></small></p>
+					</li>
+				{{else}}
+					<p>Sorry, archive is empty.</p>
+				{{end}}
+			</ul>
 		</body>
 	</html>`
 	t, err := template.New("html").Parse(html)
