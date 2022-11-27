@@ -99,35 +99,7 @@ func (app *App) index(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Add("Cache-Control", "public, max-age=86400, immutable")
-		const html = `<html>
-			<head>
-				<link href="/static/style.css" rel="stylesheet">
-				<link rel="icon" type="image/png" href="/static/favicon.png" sizes="32x32">
-				<title>Daily QR Code #{{.Id}}</title>
-				<meta property="og:title" content="Daily QR Code #{{.Id}}">
-				<meta property="og:description" content="A fresh surprise every day!">
-				<meta property="og:type" content="article">
-				<meta property="og:url" content="https://da.ilyqrco.de/{{.Id}}">
-				<meta property="og:image" content="https://da.ilyqrco.de/large/{{.Id}}">
-				<meta name="twitter:card" content="summary_large_image">
-			</head>
-			<body>
-				<h1>Daily QRCode</h1>
-				<div>Scan with your phone's camera app &#x25A0; Come back tomorrow!</div>
-				<div id="d">
-					<img class="tl" src="/static/tl.png">
-					<img class="br" src="/static/br.png">
-					<img id="i" src="/img/{{ .Id }}">
-				</div>
-				<div>{{if .Comment}} {{ .Comment }} {{end}}</div>
-				<div><a href="/about">About</a> &#x25A0; <a href="/archive">Archive</a></div>
-			</body>
-		</html>`
-		t, err := template.New("html").Parse(html)
-		panicOnErr(err)
-
-		err = t.ExecuteTemplate(w, "html", url)
-		panicOnErr(err)
+		renderPage(w, fmt.Sprintf("#%d", url.Id), url)
 		return
 	}
 
@@ -144,7 +116,42 @@ func (app *App) index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Add("Cache-Control", "public, max-age=3600")
-	http.Redirect(w, r, fmt.Sprintf("/%d", url.Id), http.StatusSeeOther)
+	renderPage(w, "Daily QR Code", url)
+}
+
+func renderPage(w http.ResponseWriter, title string, url Url) {
+	const html = `<html>
+	<head>
+		<link href="/static/style.css" rel="stylesheet">
+		<link rel="icon" type="image/png" href="/static/favicon.png" sizes="32x32">
+		<title>Daily QR Code | #{{.Url.Id}}</title>
+		<meta property="og:title" content="Daily QR Code #{{.Url.Id}}">
+		<meta property="og:description" content="A fresh surprise every day!">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://da.ilyqrco.de/{{.Url.Id}}">
+		<meta property="og:image" content="https://da.ilyqrco.de/large/{{.Url.Id}}">
+		<meta name="twitter:card" content="summary_large_image">
+	</head>
+	<body>
+		<h1>{{.Title}}</h1>
+		<div>Scan with your phone's camera app &#x25A0; Come back tomorrow!</div>
+		<div id="d">
+			<img class="tl" src="/static/tl.png">
+			<img class="br" src="/static/br.png">
+			<img id="i" src="/img/{{ .Url.Id }}">
+		</div>
+		<div>{{if .Url.Comment}} {{ .Url.Comment }} {{end}}</div>
+		<div><a href="/about">About</a> &#x25A0; <a href="/archive">Archive</a></div>
+	</body>
+</html>`
+	t, err := template.New("html").Parse(html)
+	panicOnErr(err)
+
+	err = t.ExecuteTemplate(w, "html", struct {
+		Url   Url
+		Title string
+	}{Url: url, Title: title})
+	panicOnErr(err)
 }
 
 // The QR code points to /l/<id>
