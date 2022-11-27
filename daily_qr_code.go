@@ -62,6 +62,7 @@ func main() {
 	mux.HandleFunc("/large/", nopanic(app.largeImage))
 	mux.HandleFunc("/about", nopanic(app.about))
 	mux.HandleFunc("/archive", nopanic(app.archive))
+	mux.HandleFunc("/sitemap.xml", nopanic(app.sitemap))
 	mux.HandleFunc("/l/", nopanic(app.redirect))
 	mux.HandleFunc("/", nopanic(app.index))
 	mux.HandleFunc("/robots.txt", nopanic(app.robotsTxt))
@@ -228,6 +229,45 @@ func (app *App) archive(w http.ResponseWriter, r *http.Request) {
 	panicOnErr(err)
 }
 
+func (app *App) sitemap(w http.ResponseWriter, r *http.Request) {
+	var allUrls []Url
+	now := truncatedNow()
+	err := app.db.Where("active_at <= ?", now).Find(&allUrls).Error
+	panicOnErr(err)
+
+	w.Header().Add("Content-Type", "application/xml")
+	w.Header().Add("Cache-Control", "public, max-age=3600")
+	const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  <url>
+    <loc>https://da.ilyqrco.de/</loc>
+    <lastmod>{{.Now.Format "2006-01-02T15:04:05+07:00"}}</lastmod>
+  </url>
+  <url>
+    <loc>https://da.ilyqrco.de/about</loc>
+    <lastmod>{{.Now.Format "2006-01-02T15:04:05+07:00"}}</lastmod>
+  </url>
+  <url>
+    <loc>https://da.ilyqrco.de/archive</loc>
+    <lastmod>{{.Now.Format "2006-01-02T15:04:05+07:00"}}</lastmod>
+  </url>
+{{range .AllUrls}}
+  <url>
+    <loc>https://da.ilyqrco.de/{{.Id}}</loc>
+    <lastmod>{{.ActiveAt.Format "2006-01-02T15:04:05+07:00"}}</lastmod>
+  </url>
+{{end}}
+</urlset>`
+	t, err := template.New("xml").Parse(xml)
+	panicOnErr(err)
+
+	err = t.ExecuteTemplate(w, "xml", struct {
+		AllUrls []Url
+		Now     time.Time
+	}{AllUrls: allUrls, Now: now})
+	panicOnErr(err)
+}
+
 func (app *App) image(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.URL.Path, "/img/") {
 		panic(fmt.Errorf("unexpected path: %s", r.URL.Path))
@@ -279,5 +319,5 @@ func (app *App) imageCommon(w http.ResponseWriter, id string, size int) {
 
 func (app *App) robotsTxt(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Write([]byte("User-agent: *\nAllow: /\n"))
+	w.Write([]byte("User-agent: *\nAllow: /\n\nSitemap: https://da.ilyqrco.de/sitemap.xml"))
 }
