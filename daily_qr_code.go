@@ -131,6 +131,7 @@ func renderPage(w http.ResponseWriter, title string, url Url) {
 		<meta property="og:url" content="https://da.ilyqrco.de/{{.Url.Id}}">
 		<meta property="og:image" content="https://da.ilyqrco.de/large/{{.Url.Id}}">
 		<meta name="twitter:card" content="summary_large_image">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>
 		<h1>{{.Title}}</h1>
@@ -186,6 +187,7 @@ func (app *App) about(w http.ResponseWriter, r *http.Request) {
 			<title>About Daily QR Code</title>
 			<link href="/static/style.css" rel="stylesheet">
 			<link rel="icon" type="image/png" href="/static/favicon.png" sizes="32x32">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
 		</head>
 		<body>
 			<h1>Daily QRCode</h1>
@@ -215,6 +217,7 @@ func (app *App) archive(w http.ResponseWriter, r *http.Request) {
 			<title>Daily QR Code Archive</title>
 			<link href="/static/style.css" rel="stylesheet">
 			<link rel="icon" type="image/png" href="/static/favicon.png" sizes="32x32">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
 		</head>
 		<body>
 			<h1>Archive</h1>
