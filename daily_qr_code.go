@@ -215,7 +215,6 @@ func (app *App) archive(w http.ResponseWriter, r *http.Request) {
 	const html = `<html>
 		<head>
 			<title>Daily QR Code Archive</title>
-			<link href="/static/style.css" rel="stylesheet">
 			<link rel="icon" type="image/png" href="/static/favicon.png" sizes="32x32">
 			<meta name="viewport" content="width=device-width, initial-scale=1">
 		</head>
