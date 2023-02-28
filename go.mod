@@ -3,8 +3,14 @@ module github.com/alokmenghrajani/dailyqrcode
 go 1.19
 
 require (
+	github.com/glebarez/sqlite v1.5.0
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+	gorm.io/driver/postgres v1.4.5
+	gorm.io/gorm v1.24.1
+)
+
+require (
 	github.com/glebarez/go-sqlite v1.19.1 // indirect
-	github.com/glebarez/sqlite v1.5.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.13.0 // indirect
@@ -18,12 +24,9 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
-	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
-	golang.org/x/text v0.3.7 // indirect
-	gorm.io/driver/postgres v1.4.5 // indirect
-	gorm.io/gorm v1.24.1 // indirect
+	golang.org/x/text v0.3.8 // indirect
 	modernc.org/libc v1.19.0 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.4.0 // indirect
